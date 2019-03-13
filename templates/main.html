@@ -1,0 +1,24 @@
+
+{% extends "base.html" %}
+
+{% block app_content %}
+<div class="container">
+    <div class="row">
+      <div class="col-md-6">
+            <img src="{{url_for('static', filename = '1.jpg') }}", width="500", height="500">
+      </div>
+      <div class="col-md-6">
+        <div class="container">   
+            <div class="row">
+                    <h2>Image Data</h2>
+            </div>
+            <div class = "row">
+                    <div><b id="clock"></b></div>
+            </div>
+        </div>
+      </div>    
+    </div>
+</div>
+
+    
+{% endblock %}
