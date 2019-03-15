@@ -12,3 +12,6 @@ class Camera(BaseCamera):
         while True:
             time.sleep(1)
             yield Camera.imgs[int(time.time()) % 3]
+
+    def save_frame(self, file_name):
+        print("SIMULATED SAVE")

@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 from base_camera import BaseCamera
 
 
@@ -21,3 +22,6 @@ class Camera(BaseCamera):
 
             # encode as a jpeg image and return it
             yield cv2.imencode('.jpg', img)[1].tobytes()
+
+    def save_frame(self, file_name):
+        return

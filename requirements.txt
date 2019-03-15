@@ -7,3 +7,5 @@ Werkzeug==0.12.2
 flask_bootstrap
 flask_moment
 flask_wtf
+opencv-python
+numpy

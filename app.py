@@ -26,6 +26,10 @@ app.config['STATIC_FOLDER'] = 'static'
 BITMAP_SAVE_FOLDER = '//TEST'
 app.config['BITMAP_SAVE_FOLDER']= BITMAP_SAVE_FOLDER
 
+#Changed to single camera object and thread.
+main_camera = None
+saved_fame = None
+
 def get_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
@@ -48,12 +52,16 @@ def index():
 @app.route('/video_feed')
 def video_feed():
     """Video streaming route. Put this in the src attribute of an img tag."""
-    return Response(gen(Camera()),
+    return Response(gen(main_camera),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/save_frame', methods = ['GET'])
 def save_frame():
-    return('../static/1.jpg')
+    if main_camera is not None:
+        main_camera.save_frame(app.config['STATIC_FOLDER'] + '/last_image.jpg')
+        return(app.config['STATIC_FOLDER'] + '/1.jpg')
+    else:
+        return(app.config['STATIC_FOLDER'] + '/1.jpg')
 
 ##GENERAL FUNCTIONS
 def gen(camera):
@@ -89,7 +97,13 @@ if __name__ == '__main__':
         from camera import Camera
         print("Using simulated camera")
     print(args.addr)
+
+    main_camera = Camera()
+
+
     if args.addr == "hostip":        
         app.run(host = get_ip(), port=5000, threaded=True)
     else:
         app.run(host = args.addr, port=5000, threaded=True)
+
+    

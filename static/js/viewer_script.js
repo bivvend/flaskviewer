@@ -15,8 +15,7 @@ $(document).ready(function(){
         getDate()}, 500);
     }
 
-    $("#getFrameButton").click(function(){
-        
+    $("#getFrameButton").click(function(){        
         $.ajax({url:'save_frame',
                 success: function(result){
                     $('#storedImage').attr('src', result);
