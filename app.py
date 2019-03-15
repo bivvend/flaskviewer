@@ -51,10 +51,9 @@ def video_feed():
     return Response(gen(Camera()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@app.route('/get_frame', methods = ['GET'])
-def get_frame():
-    frame = single_frame(Camera())
-    return(frame)
+@app.route('/save_frame', methods = ['GET'])
+def save_frame():
+    return('../static/1.jpg')
 
 ##GENERAL FUNCTIONS
 def gen(camera):
@@ -63,13 +62,6 @@ def gen(camera):
         frame = camera.get_frame()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-def single_frame(camera):
-    """Video streaming generator function."""
-    frame = camera.get_frame()
-    return (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
 
 ##MAIN
 if __name__ == '__main__':
@@ -88,8 +80,9 @@ if __name__ == '__main__':
             from camera import Camera
     elif args.cam == 'picam':
         # Raspberry Pi camera module (requires picamera package)
+        print("Using Raspberry Pi Camera.")
         from camera_pi import Camera
-    elif args.cam == 'simualted':    
+    elif args.cam == 'simulated':    
         from camera_pi import Camera
         print("Using simulated camera")
     else:

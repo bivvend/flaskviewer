@@ -16,22 +16,16 @@ $(document).ready(function(){
     }
 
     $("#getFrameButton").click(function(){
-        $.ajax({
-            url:"/get_frame",
-            success: function(result){
-                $('#storedImage').attr('src', result);
-            },
-            failure: function(result){
-                alert("Frame grab failed.");
-                console.log("Frame grab failed.");
-            },
-            error: function(result){
-                alert("Frame grab failed.");
-                console.log("Frame grab failed.");
-            }
-
+        
+        $.ajax({url:'save_frame',
+                success: function(result){
+                    $('#storedImage').attr('src', result);
+                } 
+            
         });
     });
+
+
        
     getDate();
 });
