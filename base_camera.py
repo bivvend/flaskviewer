@@ -56,8 +56,8 @@ class BaseCamera(object):
     frame = None  # current frame is stored here by background thread
     last_access = 0  # time of last client access to the camera
     event = CameraEvent()
-    running = False # Used to pause camera for grab
-    file_path = "output.jpg"
+    running = False # Used to toggle saving during grabbing
+    file_path = "output.jpg" # default
     def __init__(self):
         """Start the background camera thread if it isn't running yet."""
         if BaseCamera.thread is None:
@@ -73,10 +73,12 @@ class BaseCamera(object):
             BaseCamera.running = True
             
     def set_running_state(self, state_in):
+        """Sets the state True is grabbing without saving, False = saving"""
         print("Setting")
         BaseCamera.running = state_in
         
     def get_running_state(self):
+        """Returns the state true is grabbing without saving, False = saving"""
         return BaseCamera.running
             
     def get_frame(self):
@@ -87,7 +89,11 @@ class BaseCamera(object):
         BaseCamera.event.wait()
         BaseCamera.event.clear()
 
-        return BaseCamera.frame    
+        return BaseCamera.frame   
+        
+    def set_save_location(self, file_path_in):
+        """Sets the file path for saving"""
+        BaseCamera.file_path = file_path_in
 
     @staticmethod
     def frames():
@@ -102,7 +108,7 @@ class BaseCamera(object):
         for frame in frames_iterator:
             BaseCamera.frame = frame
             BaseCamera.event.set()  # send signal to clients
-            time.sleep(0.01)
+            time.sleep(0)
 
             # if there hasn't been any clients asking for frames in
             # the last 10 seconds then stop the thread

@@ -7,7 +7,7 @@ import time
 import socket
 
 #Flask imports
-from flask import Flask, render_template, Response, redirect, flash, session, url_for, send_file, make_response
+from flask import Flask, jsonify, render_template, Response, redirect, flash, session, url_for, send_file, make_response
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from flask_wtf import Form
@@ -24,7 +24,7 @@ bootstrap = Bootstrap(app)
 moment = Moment(app)
 app.config['SECRET_KEY'] = 'hard to guess string'
 app.config['STATIC_FOLDER'] = 'static'
-BITMAP_SAVE_FOLDER = '//TEST'
+BITMAP_SAVE_FOLDER = '//Images'
 app.config['BITMAP_SAVE_FOLDER']= BITMAP_SAVE_FOLDER
 
 #Changed to single camera object and thread.
@@ -58,14 +58,17 @@ def video_feed():
 
 @app.route('/save_frame', methods = ['GET'])
 def save_frame():
+    """Saves a frame to be displayed on screen - not for processing"""
     if main_camera is not None:
+        main_camera.set_save_location(app.config['STATIC_FOLDER'] + '/output.jpg')
         main_camera.set_running_state(False)
         #Sleep until a frame has been saved
         time.sleep(1)
         main_camera.set_running_state(True)
-        return('SAVED')
+        main_camera.set_save_location(app.config['BITMAP_SAVE_FOLDER'] + '/output.jpg')
+        return jsonify(result = app.config['STATIC_FOLDER'] + '/output.jpg')
     else:
-        return('NOT_SAVED')
+        return jsonify(result = 'NOT_SAVED')
 
 ##GENERAL FUNCTIONS
 def gen(camera):
@@ -106,7 +109,7 @@ if __name__ == '__main__':
     print(args.addr)
 
     main_camera = Camera()
-
+    main_camera.set_save_location(app.config['STATIC_FOLDER'] + '/output.jpg')
 
     if args.addr == "hostip":        
         app.run(host = get_ip(), port=5000, threaded=True)

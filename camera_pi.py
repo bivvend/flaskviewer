@@ -19,9 +19,9 @@ class Camera(BaseCamera):
                                                  use_video_port=True):
                 # return current frame
                 stream.seek(0)
-                print(BaseCamera.running)
+                #print(BaseCamera.running)
                 if not BaseCamera.running:
-                    print("Saving image")
+                    print("Saving image in {}".format(BaseCamera.file_path))
                     data = np.fromstring(stream.getvalue(), dtype = np.uint8)
                     img = cv2.imdecode(data, 1)
                     cv2.imwrite(BaseCamera.file_path, img)
