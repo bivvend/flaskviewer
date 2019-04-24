@@ -3,6 +3,7 @@ from importlib import import_module
 import os
 import os
 import sys
+import time
 import socket
 
 #Flask imports
@@ -28,7 +29,7 @@ app.config['BITMAP_SAVE_FOLDER']= BITMAP_SAVE_FOLDER
 
 #Changed to single camera object and thread.
 main_camera = None
-saved_fame = None
+
 
 def get_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -58,16 +59,22 @@ def video_feed():
 @app.route('/save_frame', methods = ['GET'])
 def save_frame():
     if main_camera is not None:
-        main_camera.save_frame(app.config['STATIC_FOLDER'] + '/last_image.jpg')
-        return(app.config['STATIC_FOLDER'] + '/1.jpg')
+        main_camera.set_running_state(False)
+        #Sleep until a frame has been saved
+        time.sleep(1)
+        main_camera.set_running_state(True)
+        return('SAVED')
     else:
-        return(app.config['STATIC_FOLDER'] + '/1.jpg')
+        return('NOT_SAVED')
 
 ##GENERAL FUNCTIONS
 def gen(camera):
     """Video streaming generator function."""
     while True:
         frame = camera.get_frame()
+        #save frame to file
+        if not camera.get_running_state():
+            print("Saving from app.py")
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 

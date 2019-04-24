@@ -18,7 +18,7 @@ $(document).ready(function(){
     $("#getFrameButton").click(function(){        
         $.ajax({url:'save_frame',
                 success: function(result){
-                    $('#storedImage').attr('src', result);
+                    console.log(result);
                 } 
             
         });
