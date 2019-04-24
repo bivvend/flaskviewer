@@ -19,7 +19,7 @@ $(document).ready(function(){
         $.ajax({url:'save_frame',
                 success: function(resp){
                     console.log(resp);
-                    $(#storedImage).attr('src', resp.result);
+                    $("#storedImage").attr('src', resp.result + "?t=" + new Date().getTime());
                 } 
             
         });

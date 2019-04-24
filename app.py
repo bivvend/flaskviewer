@@ -45,6 +45,14 @@ def get_ip():
 
 #ROUTE FUNCTIONS
 
+# No cacheing at all for API endpoints.
+@app.after_request
+def add_header(response):
+    # response.cache_control.no_store = True
+    if 'Cache-Control' not in response.headers:
+        response.headers['Cache-Control'] = 'no-store'
+    return response
+    
 @app.route('/')
 def index():
     """Video streaming home page."""
