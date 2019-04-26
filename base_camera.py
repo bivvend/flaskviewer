@@ -1,5 +1,9 @@
 import time
+import cv2
+import numpy as np
 import threading
+import os
+
 try:
     from greenlet import getcurrent as get_ident
 except ImportError:
@@ -57,7 +61,9 @@ class BaseCamera(object):
     last_access = 0  # time of last client access to the camera
     event = CameraEvent()
     running = False # Used to toggle saving during grabbing
+    in_cycle = False # Used to toggle if saving should make new images
     file_path = "output.jpg" # default
+    image_buffer_list = []
     def __init__(self):
         """Start the background camera thread if it isn't running yet."""
         if BaseCamera.thread is None:
@@ -72,10 +78,21 @@ class BaseCamera(object):
                 time.sleep(1)
             BaseCamera.running = True
             
-    def set_running_state(self, state_in):
+    def set_running_state(self, state_in, in_cycle_in):
         """Sets the state True is grabbing without saving, False = saving"""
         print("Setting")
         BaseCamera.running = state_in
+        BaseCamera.in_cycle = in_cycle_in
+    
+    def clear_buffers(self):
+        '''Clears the image buffers'''
+        BaseCamera.image_buffer_list = []
+        
+    def save_buffers(self, directory):
+        '''Saves the buffers to file'''
+        for i, im in enumerate(BaseCamera.image_buffer_list):
+            print("Saving {}".format(i))
+            cv2.imwrite(os.path.join(directory, str(i) + ".jpg"), im)
         
     def get_running_state(self):
         """Returns the state true is grabbing without saving, False = saving"""

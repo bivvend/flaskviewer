@@ -26,7 +26,7 @@ bootstrap = Bootstrap(app)
 moment = Moment(app)
 app.config['SECRET_KEY'] = 'hard to guess string'
 app.config['STATIC_FOLDER'] = 'static'
-BITMAP_SAVE_FOLDER = '//Images'
+BITMAP_SAVE_FOLDER = 'static/Images'
 app.config['BITMAP_SAVE_FOLDER']= BITMAP_SAVE_FOLDER
 
 #Changed to single camera object and thread.
@@ -71,10 +71,10 @@ def save_frame():
     """Saves a frame to be displayed on screen - not for processing"""
     if main_camera is not None:
         main_camera.set_save_location(app.config['STATIC_FOLDER'] + '/output.jpg')
-        main_camera.set_running_state(False)
+        main_camera.set_running_state(False, False)
         #Sleep until a frame has been saved
         time.sleep(1)
-        main_camera.set_running_state(True)
+        main_camera.set_running_state(True, False)
         main_camera.set_save_location(app.config['BITMAP_SAVE_FOLDER'] + '/output.jpg')
         return jsonify(result = app.config['STATIC_FOLDER'] + '/output.jpg')
     else:
@@ -82,14 +82,7 @@ def save_frame():
         
 @app.route('/run_cycle', methods = ['GET'])
 def run_cycle():
-    print("Running linear actuator cycle")
-    lin_acc.set_duty(0.25)
-    time.sleep(10)
-    lin_acc.set_duty(0.8)
-    time.sleep(10)
-    lin_acc.set_duty(0.1)
-    lin_acc.stop()
-    
+    run_actuator_cycle()   
     
     return jsonify(result = "RAN_OK")
 
@@ -103,6 +96,21 @@ def gen(camera):
             print("Saving from app.py")
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+               
+def run_actuator_cycle():
+    print("Running linear actuator cycle")
+    main_camera.clear_buffers()
+    main_camera.set_running_state(False, True) #start grabbing to series
+    lin_acc.set_duty(0.1)
+    time.sleep(2)
+    lin_acc.set_duty(0.8)
+    time.sleep(5)
+    lin_acc.set_duty(0.1)
+    time.sleep(5)
+    main_camera.set_running_state(True, False) # stop grabbing 
+    lin_acc.stop() 
+    main_camera.save_buffers(app.config['BITMAP_SAVE_FOLDER'])   
+    
 
 ##MAIN
 if __name__ == '__main__':
@@ -137,8 +145,8 @@ if __name__ == '__main__':
     
     #Setup Actuator
     lin_acc = PQ12actuator(18, 1000, 0)
-    lin_acc.start()
-    lin_acc.set_duty(0.25)
+    lin_acc.start() # setup
+    lin_acc.stop() #set duty and freq to zero
 
     if args.addr == "hostip":        
         app.run(host = get_ip(), port=5000, threaded=True)
