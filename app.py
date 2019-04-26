@@ -16,6 +16,8 @@ from werkzeug.utils import secure_filename
 from wtforms.validators import Required
 import argparse
 
+from pq12_actuator import PQ12actuator
+
 
 #Camera feed apdapted from https://github.com/miguelgrinberg/flask-video-streaming
 
@@ -77,6 +79,19 @@ def save_frame():
         return jsonify(result = app.config['STATIC_FOLDER'] + '/output.jpg')
     else:
         return jsonify(result = 'NOT_SAVED')
+        
+@app.route('/run_cycle', methods = ['GET'])
+def run_cycle():
+    print("Running linear actuator cycle")
+    lin_acc.set_duty(0.25)
+    time.sleep(10)
+    lin_acc.set_duty(0.8)
+    time.sleep(10)
+    lin_acc.set_duty(0.1)
+    lin_acc.stop()
+    
+    
+    return jsonify(result = "RAN_OK")
 
 ##GENERAL FUNCTIONS
 def gen(camera):
@@ -116,8 +131,14 @@ if __name__ == '__main__':
         print("Using simulated camera")
     print(args.addr)
 
+    #Setup camera
     main_camera = Camera()
     main_camera.set_save_location(app.config['STATIC_FOLDER'] + '/output.jpg')
+    
+    #Setup Actuator
+    lin_acc = PQ12actuator(18, 1000, 0)
+    lin_acc.start()
+    lin_acc.set_duty(0.25)
 
     if args.addr == "hostip":        
         app.run(host = get_ip(), port=5000, threaded=True)

@@ -24,6 +24,14 @@ $(document).ready(function(){
             
         });
     });
+    
+    $("#runCycleButton").click(function(){
+      $.ajax({url:'run_cycle',
+                success: function(resp){
+                    console.log(resp);                    
+                }             
+        });         
+    });
 
 
        
