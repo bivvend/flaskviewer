@@ -59,6 +59,11 @@ def add_header(response):
 def index():
     """Video streaming home page."""
     return render_template('main.html') #was index.html
+    
+@app.route('/gallery')
+def gallery():
+    """Image browse page"""
+    return render_template('gallery.html') 
 
 @app.route('/video_feed')
 def video_feed():

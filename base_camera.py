@@ -85,11 +85,15 @@ class BaseCamera(object):
         BaseCamera.in_cycle = in_cycle_in
     
     def clear_buffers(self):
-        '''Clears the image buffers'''
+        '''Clears the image buffers.'''
+        
         BaseCamera.image_buffer_list = []
         
     def save_buffers(self, directory):
-        '''Saves the buffers to file'''
+        '''Saves the buffers to file. Warning will delete any images in that directory first.'''
+        for file in os.listdir(directory):
+            if ".jpg" in file:
+                os.remove(os.path.join(directory, file))
         for i, im in enumerate(BaseCamera.image_buffer_list):
             print("Saving {}".format(i))
             cv2.imwrite(os.path.join(directory, str(i) + ".jpg"), im)
