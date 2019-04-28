@@ -1,6 +1,10 @@
 
 {% extends "base.html" %}
 
+{% block head %}
+    {{ super() }}
+    <script src="{{url_for('static', filename='js/viewer_script.js')}}"></script>
+{% endblock %}
 
 {% block app_content %}
 <div class="container">
