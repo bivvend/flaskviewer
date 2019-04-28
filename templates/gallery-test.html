@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+    <head>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+        <script src="{{url_for('static', filename='galleria/galleria-1.5.7.min.js')}}"></script>
+    </head>
+    <body>
+        <script>
+	(function() { 
+            if (Galleria) { $("body").text('Galleria works') }
+	}());
+        </script>
+    </body>
+</html>

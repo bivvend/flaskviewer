@@ -1,11 +1,13 @@
   
 {% extends 'bootstrap/base.html' %}
 
-{% block scripts %}
+{% block head %}
     {{ super() }}
     <script src="{{url_for('static', filename='js/jquery-3.3.1.min.js')}}"></script>
     <script src="{{url_for('static', filename='js/viewer_script.js')}}"></script>
+    <script src="{{url_for('static', filename='galleria/galleria-1.5.7.min.js')}}"></script>
 {% endblock %}
+
 
 {% block title %}
     GemView
@@ -38,7 +40,6 @@
 
 {% block content %}
     {% block app_content %}
-
     {% endblock %}
 {% endblock %}
 
