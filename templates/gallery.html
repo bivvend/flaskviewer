@@ -5,6 +5,10 @@
 {% block head %}
     {{ super() }}
     <script src="{{url_for('static', filename='galleria/galleria-1.5.7.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/gallery_script.js')}}"></script>
+    <style>
+        .galleria{max-width: 700px; height: 500px;}
+    </style>
 {% endblock %}
 
 
@@ -12,16 +16,22 @@
 
 <div class="container">
     <div class="row">
-      <div>
-        <h2 id="gallery"></h1>         
-      </div>   
+        <h2 id="gallery">Gallery</h1> 
+    </div>
+    <div>
+        <button id="refreshButton" type="button" class="btn btn-default btn-lg">Refresh</button>
+    </div>
+    <div class="row">  
+        <div id="galleryWrapper"> 
+            <div class="galleria">
+                <img src= "{{url_for('static', filename='Images/0.jpg')}}">
+                <img src= "{{url_for('static', filename='Images/1.jpg')}}">
+                <img src= "{{url_for('static', filename='Images/2.jpg')}}">
+                <img src= "{{url_for('static', filename='Images/3.jpg')}}">          
+            </div>
+        </div>   
     </div>
 </div>  
 
-<script>
-(function() { 
-    if (Galleria) { $("#gallery").text('Galleria') }
-}());
-</script>
-  
+ 
 {% endblock %}

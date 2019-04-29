@@ -1,10 +1,13 @@
 #!/usr/bin/env python
+#external imports
 from importlib import import_module
 import os
 import os
 import sys
 import time
 import socket
+import argparse
+from yattag import Doc
 
 #Flask imports
 from flask import Flask, jsonify, render_template, Response, redirect, flash, session, url_for, send_file, make_response
@@ -14,8 +17,8 @@ from flask_wtf import Form
 from wtforms import StringField, SubmitField,FileField, IntegerField, FloatField, BooleanField
 from werkzeug.utils import secure_filename
 from wtforms.validators import Required
-import argparse
 
+#internal imports
 from pq12_actuator import PQ12actuator
 
 
@@ -87,9 +90,14 @@ def save_frame():
         
 @app.route('/run_cycle', methods = ['GET'])
 def run_cycle():
-    run_actuator_cycle()   
-    
+    '''Runs the lucky imaging cycle'''
+    run_actuator_cycle()
     return jsonify(result = "RAN_OK")
+    
+@app.route('/gallery_refresh', methods = ['GET'])
+def gallery_refresh():
+    '''Return the html for the gallery wrapper'''    
+    return make_gallery_html();
 
 ##GENERAL FUNCTIONS
 def gen(camera):
@@ -114,7 +122,16 @@ def run_actuator_cycle():
     time.sleep(5)
     main_camera.set_running_state(True, False) # stop grabbing 
     lin_acc.stop() 
-    main_camera.save_buffers(app.config['BITMAP_SAVE_FOLDER'])   
+    main_camera.save_buffers(app.config['BITMAP_SAVE_FOLDER'])  
+    
+def make_gallery_html():
+    doc, tag, text = Doc().tagtext()
+    with tag('div', klass = 'galleria'): 
+        for file in os.listdir(app.config['BITMAP_SAVE_FOLDER']):
+            if ".jpg" in file:
+                doc.stag('img', src = os.path.join(app.config['BITMAP_SAVE_FOLDER'], file + "?t=" + str(time.time())))       
+        
+    return(doc.getvalue())    
     
 
 ##MAIN

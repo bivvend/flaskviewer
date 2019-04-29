@@ -10,7 +10,7 @@ $(document).ready(function(){
         if (m < 10) {
            m = "0" + m;
     }
-    $("#clock").text(h+" : "+m+" : "+s);
+    $("#clock").text("Time: " +h+" : "+m+" : "+s);
     setTimeout(function(){
         getDate()}, 500);
     }

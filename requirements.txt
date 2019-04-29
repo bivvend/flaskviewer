@@ -9,3 +9,4 @@ flask_moment
 flask_wtf
 opencv-python
 numpy
+yattag
