@@ -5,7 +5,7 @@ import time
 import os
 import math
 import peakutils
-
+from multiprocessing.dummy import Pool as ThreadPool
 #Load all images from dir
 
 im_path ='/home/pi/github/ViewerImages/w2'  
@@ -37,7 +37,8 @@ keypoint_list = []
 
 kp1, des1 = orb.detectAndCompute(comp_im,None)
 
-for f, img, in image_list:
+def run_processing(tup):
+    f, img = tup
     kp2, des2 = orb.detectAndCompute(img,None)
     pts = cv2.KeyPoint_convert(kp2)    
     matches = bf.match(des2, des1)
@@ -52,9 +53,19 @@ for f, img, in image_list:
         img_filt = cv2.bilateralFilter(img[:,:], 5, 100, 100) ##ADD A FILTER
         val = cv2.Laplacian(img_filt.astype(np.float64)[:,:], cv2.CV_64F).var()
     val_list.append(val * (math.sqrt(len(matches)) + 1)) 
-    
 
-    end = time.time()
+use_threads = True
+
+if use_threads:
+    pool = ThreadPool(4)
+    pool.map(run_processing, image_list)
+    pool.close()
+    pool.join()
+else:
+    for tup in image_list:
+        run_processing(tup)
+
+end = time.time()
 print("{0} images processed in {1} seconds".format(len(image_list), round(end - start, 3)))
 
 #Pick N best using peak fitting
