@@ -10,3 +10,6 @@ flask_wtf
 opencv-python
 numpy
 yattag
+scipy
+peakutils
+matplotlib

@@ -117,7 +117,7 @@ def run_actuator_cycle():
     lin_acc.set_duty(0.1)
     time.sleep(2)
     lin_acc.set_duty(0.8)
-    time.sleep(5)
+    time.sleep(7)
     lin_acc.set_duty(0.1)
     time.sleep(5)
     main_camera.set_running_state(True, False) # stop grabbing 
