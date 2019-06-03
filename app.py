@@ -114,6 +114,11 @@ def run_processing():
 def gallery_refresh():
     '''Return the html for the gallery wrapper'''    
     return make_gallery_html();
+    
+@app.route('/best_gallery_refresh', methods = ['GET'])
+def best_gallery_refresh():
+    '''Return the html for the gallery wrapper'''    
+    return make_best_gallery_html();
 
 ##GENERAL FUNCTIONS
 def gen(camera):
@@ -169,7 +174,16 @@ def make_gallery_html():
             if ".jpg" in file:
                 doc.stag('img', src = os.path.join(app.config['BITMAP_SAVE_FOLDER'], file + "?t=" + str(time.time())))       
         
-    return(doc.getvalue())    
+    return(doc.getvalue())  
+    
+def make_best_gallery_html():
+    doc, tag, text = Doc().tagtext()
+    with tag('div', klass = 'galleriaBest'): 
+        for file in os.listdir(app.config['BITMAP_SAVE_FOLDER']):
+            if ".jpg" in file and "best" in file:
+                doc.stag('img', src = os.path.join(app.config['BITMAP_SAVE_FOLDER'], file + "?t=" + str(time.time())))       
+        
+    return(doc.getvalue())  
     
 
 ##MAIN

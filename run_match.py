@@ -53,10 +53,10 @@ def process_images(image_list, im_path):
         print("Number of matches for image {0} = {1}".format(f, len(matches)))
         if len(img.shape) > 2:
             grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            img_filt = cv2.bilateralFilter(grey, 10, 100, 100) ##ADD A FILTER
+            img_filt = cv2.bilateralFilter(grey, 6, 100, 100) ##ADD A FILTER
             val = cv2.Laplacian(img_filt.astype(np.float64), cv2.CV_64F).var()       
         else:            
-            img_filt = cv2.bilateralFilter(img, 10, 100, 100) ##ADD A FILTER
+            img_filt = cv2.bilateralFilter(img, 6, 100, 100) ##ADD A FILTER
             val = cv2.Laplacian(img_filt.astype(np.float64)[:,:], cv2.CV_64F).var()
         val_list.append(val * (math.sqrt(len(matches)) + 1)) 
 
