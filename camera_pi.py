@@ -23,10 +23,11 @@ class Camera(BaseCamera):
                 #print(BaseCamera.running)
                 if not BaseCamera.running:
                     if BaseCamera.in_cycle:
-                        print("Saving image to buffer".format(BaseCamera.file_path))
+                        print("Saving image to buffer")
                         data = np.fromstring(stream.getvalue(), dtype = np.uint8)
                         img = cv2.imdecode(data, 1)
-                        BaseCamera.image_buffer_list.append(img)
+                        img_num = len(BaseCamera.image_buffer_list)
+                        BaseCamera.image_buffer_list.append((str(img_num) + ".jpg", img))
                     else:
                         print("Saving image in {}".format(BaseCamera.file_path))
                         data = np.fromstring(stream.getvalue(), dtype = np.uint8)

@@ -63,7 +63,7 @@ class BaseCamera(object):
     running = False # Used to toggle saving during grabbing
     in_cycle = False # Used to toggle if saving should make new images
     file_path = "output.jpg" # default
-    image_buffer_list = []
+    image_buffer_list = []  #tuples of filename, image data
     def __init__(self):
         """Start the background camera thread if it isn't running yet."""
         if BaseCamera.thread is None:
@@ -88,15 +88,24 @@ class BaseCamera(object):
         '''Clears the image buffers.'''
         
         BaseCamera.image_buffer_list = []
-        
-    def save_buffers(self, directory):
-        '''Saves the buffers to file. Warning will delete any images in that directory first.'''
+    
+    def load_images_to_buffers(self, directory):
+        BaseCamera.image_buffer_list = []
         for file in os.listdir(directory):
-            if ".jpg" in file:
-                os.remove(os.path.join(directory, file))
-        for i, im in enumerate(BaseCamera.image_buffer_list):
-            print("Saving {}".format(i))
-            cv2.imwrite(os.path.join(directory, str(i) + ".jpg"), im)
+            if ".jpg" in file and "best" not in file:
+                im = cv2.imread(os.path.join(directory, file))
+                BaseCamera.image_buffer_list.append((file, im))
+        print("{0} Images loaded".format(len(BaseCamera.image_buffer_list)))
+    
+    def save_buffers(self, directory, delete_files):
+        '''Saves the buffers to file. Warning will delete any images in that directory first.'''
+        if delete_files:
+            for file in os.listdir(directory):
+                if ".jpg" in file:
+                    os.remove(os.path.join(directory, file))
+            for i, im in BaseCamera.image_buffer_list:
+                print("Saving {}".format(i))
+                cv2.imwrite(os.path.join(directory, i), im)
         
     def get_running_state(self):
         """Returns the state true is grabbing without saving, False = saving"""

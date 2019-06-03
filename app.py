@@ -2,7 +2,6 @@
 #external imports
 from importlib import import_module
 import os
-import os
 import sys
 import time
 import socket
@@ -20,6 +19,7 @@ from wtforms.validators import Required
 
 #internal imports
 from pq12_actuator import PQ12actuator
+from run_match import process_images
 
 
 #Camera feed apdapted from https://github.com/miguelgrinberg/flask-video-streaming
@@ -34,6 +34,15 @@ app.config['BITMAP_SAVE_FOLDER']= BITMAP_SAVE_FOLDER
 
 #Changed to single camera object and thread.
 main_camera = None
+
+act = "USE_ACTUATOR"
+stepper = "USE_STEPPER"
+
+debug = "USE_DEBUG"
+overwrite = "OVERWRITE"
+
+motion = act
+saving = debug
 
 
 def get_ip():
@@ -94,6 +103,13 @@ def run_cycle():
     run_actuator_cycle()
     return jsonify(result = "RAN_OK")
     
+@app.route('/run_processing', methods = ['GET'])
+def run_processing():
+    '''Runs the lucky imaging processing'''
+    run_image_processing()
+    return jsonify(result = "RAN_OK")    
+
+    
 @app.route('/gallery_refresh', methods = ['GET'])
 def gallery_refresh():
     '''Return the html for the gallery wrapper'''    
@@ -110,19 +126,41 @@ def gen(camera):
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
                
+def run_image_processing():
+    
+    if saving == debug:
+        print("DEBUG: Loading images from file")
+        start = time.time()
+        main_camera.load_images_to_buffers(app.config['BITMAP_SAVE_FOLDER'])
+        end = time.time()
+        print("{0} images loaded in {1} seconds".format(len(main_camera.image_buffer_list), round(end - start, 3)))
+   
+    process_images(main_camera.image_buffer_list, app.config['BITMAP_SAVE_FOLDER'])
+               
 def run_actuator_cycle():
-    print("Running linear actuator cycle")
+    print("Running linear motion cycle")
     main_camera.clear_buffers()
-    main_camera.set_running_state(False, True) #start grabbing to series
-    lin_acc.set_duty(0.1)
-    time.sleep(2)
-    lin_acc.set_duty(0.8)
-    time.sleep(7)
-    lin_acc.set_duty(0.1)
-    time.sleep(5)
-    main_camera.set_running_state(True, False) # stop grabbing 
-    lin_acc.stop() 
-    main_camera.save_buffers(app.config['BITMAP_SAVE_FOLDER'])  
+    
+    if motion != debug:
+        main_camera.set_running_state(False, True) #start grabbing to series
+    if motion == act:
+        lin_acc.set_duty(0.1)
+        time.sleep(2)
+        lin_acc.set_duty(0.8)
+        time.sleep(7)
+        lin_acc.set_duty(0.1)
+        time.sleep(5)
+    if motion == stepper:
+        print("Running stepper cycle")
+    if motion != debug:
+        main_camera.set_running_state(True, False) # stop grabbing 
+    if motion == act:
+        lin_acc.stop() 
+    if saving == debug:
+        delete = False
+    else:
+        delete = True
+    main_camera.save_buffers(app.config['BITMAP_SAVE_FOLDER'], delete)  
     
 def make_gallery_html():
     doc, tag, text = Doc().tagtext()
@@ -165,10 +203,17 @@ if __name__ == '__main__':
     main_camera = Camera()
     main_camera.set_save_location(app.config['STATIC_FOLDER'] + '/output.jpg')
     
+    if motion == act:
     #Setup Actuator
-    lin_acc = PQ12actuator(18, 1000, 0)
-    lin_acc.start() # setup
-    lin_acc.stop() #set duty and freq to zero
+        print("Setting up linear actuator")
+        lin_acc = PQ12actuator(18, 1000, 0)
+        lin_acc.start() # setup
+        lin_acc.stop() #set duty and freq to zero
+    if motion == stepper:
+        print("Setting up stepper motor")
+        pass
+    if motion == debug:
+        print("Using simulated motion")
 
     if args.addr == "hostip":        
         app.run(host = get_ip(), port=5000, threaded=True)

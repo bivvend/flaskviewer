@@ -26,14 +26,22 @@ $(document).ready(function(){
     });
     
     $("#runCycleButton").click(function(){
-      $.ajax({url:'run_cycle',
+        $.ajax({url:'run_cycle',
                 success: function(resp){
                     console.log(resp);                    
                 }             
         });         
     });
+    
+    $("#runProcessingButton").click(function(){
+        $ .ajax({url:'run_processing',
+                success: function(resp){
+                    console.log(resp);                    
+                }             
+        });         
+    
+    
+    });
 
-
-       
     getDate();
 });
