@@ -32,7 +32,6 @@ class StepperController():
         ] 
         
         self.rev_halfstep_seq = list(reversed(self.halfstep_seq))  
-        print(self.rev_halfstep_seq)    
         
     def set_freq(self, freq_in):
         self.freq = freq_in
@@ -43,6 +42,7 @@ class StepperController():
         
     
     def step(self, number = 1):
+        time.sleep(0.001)
         for step_num in range(number):
             for halfstep in range(8):
                 for pin in range(4):
@@ -51,11 +51,11 @@ class StepperController():
                     else:
                         GPIO.output(self.control_pins[pin], self.rev_halfstep_seq[halfstep][pin])
                     time.sleep(0.001)
-                if self.forward:
-                    self.step_count +=1
-                else:
-                    self.step_count -= 1
-                print(self.step_count)
+            if self.forward:
+                self.step_count +=1
+            else:
+                self.step_count -= 1
+            print(self.step_count)
             
     def start(self):
         self.running = True
@@ -74,10 +74,34 @@ class StepperController():
         self.thread = None
         
     def make_step(self, number = 1, forward = True):
-        self.set_direction(forward)
         if self.thread is None:
-            self.step(number)            
+            self.set_direction(forward)
+            if self.thread is None:
+                self.step(number) 
             
+    def get_count(self):
+        return self.step_count
+        
+    def reset_count(self):
+        self.step_count = 0
+        print("Zeroed step count")
+        
+    def move_to_count(self, target):
+        if self.thread is None:
+            moving = True
+            while moving:
+                if target > self.get_count():
+                    self.make_step(1, True)
+                if target < self.get_count():
+                    self.make_step(1, False)
+                if target == self.get_count():
+                    break
+            print("Found count target of {0}".format(target))
+        
+    def home(self):
+        if self.thread is None:
+            self.move_to_count(0)
+            self.reset_count()
         
 if __name__ == '__main__':
     try:
@@ -88,9 +112,9 @@ if __name__ == '__main__':
         #time.sleep(3)
         #s.stop()
         #time.sleep(1)
-        s.make_step(1, True)
-        time.sleep(1)
-        s.make_step(1, False)
+        #s.make_step(1, False)
+        s.move_to_count(100)
+        s.home()
         GPIO.cleanup()
     except Exception as e:
         print(e)
