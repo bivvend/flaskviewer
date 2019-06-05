@@ -27,13 +27,26 @@
             </div>
             <hr>
             <div class = "row">
-              <div class = "col">
-                <button id="runCycleButton" type="button" class="btn btn-default btn-lg">Cycle Actuator</button>
-              </div>
-              <div class = "col">
-                <button id="runProcessingButton" type="button" class="btn btn-default btn-lg ml-auto">Process Images</button>
-              </div>
+              <button id="runCycleButton" type="button" class="btn btn-default btn-lg">Cycle Actuator</button>
             </div>
+            <div class = "row">
+              <button id="stepPlusButton" type="button" class="btn btn-default btn-lg">+ve step</button>
+            </div> 
+            <div class = "row">
+              <button id="stepMinusButton" type="button" class="btn btn-default btn-lg">-ve step</button>
+            </div> 
+            <div class = "row">
+              <button id="stepHomeButton" type="button" class="btn btn-default btn-lg">Home</button>
+            </div>   
+            <div class = "row">
+              <b id = "countLabel"> Stepper counts = 0</b>
+            </div>           
+            <hr>
+            <div class = "row">
+              <button id="runProcessingButton" type="button" class="btn btn-default btn-lg ml-auto">Process Images</button>
+            </div>
+            
+
             <hr>
             <div class = "row">
               <image id="storedImage" src="/static/output.jpg" width = "300" height="300"></image>

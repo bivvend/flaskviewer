@@ -27,7 +27,8 @@ class Camera(BaseCamera):
                         data = np.fromstring(stream.getvalue(), dtype = np.uint8)
                         img = cv2.imdecode(data, 1)
                         img_num = len(BaseCamera.image_buffer_list)
-                        BaseCamera.image_buffer_list.append((str(img_num) + ".jpg", img))
+                        step_num = str(BaseCamera.stepper.get_count())
+                        BaseCamera.image_buffer_list.append((str(img_num) + "_" + step_num + ".jpg", img))
                     else:
                         print("Saving image in {}".format(BaseCamera.file_path))
                         data = np.fromstring(stream.getvalue(), dtype = np.uint8)

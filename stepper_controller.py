@@ -77,8 +77,14 @@ class StepperController():
         if self.thread is None:
             self.set_direction(forward)
             if self.thread is None:
-                self.step(number) 
-            
+                self.step(number)                
+        self.reset_pins()
+        return self.get_count()
+    
+    def reset_pins(self):
+        for pin in range(4):
+            GPIO.output(self.control_pins[pin], 0)
+        
     def get_count(self):
         return self.step_count
         
@@ -102,6 +108,10 @@ class StepperController():
         if self.thread is None:
             self.move_to_count(0)
             self.reset_count()
+            
+    def clean_up(self):
+        s.stop()
+        GPIO.cleanup()
         
 if __name__ == '__main__':
     try:

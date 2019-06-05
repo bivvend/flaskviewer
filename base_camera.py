@@ -64,8 +64,12 @@ class BaseCamera(object):
     in_cycle = False # Used to toggle if saving should make new images
     file_path = "output.jpg" # default
     image_buffer_list = []  #tuples of filename, image data
-    def __init__(self):
+    stepper = None
+    def __init__(self, stepper_in):
         """Start the background camera thread if it isn't running yet."""
+        
+        BaseCamera.stepper = stepper_in 
+        print("Camera associated with stepper with pins {0}.".format(BaseCamera.stepper.control_pins))
         if BaseCamera.thread is None:
             BaseCamera.last_access = time.time()
 

@@ -25,6 +25,38 @@ $(document).ready(function(){
         });
     });
     
+    $("#stepPlusButton").click(function(){        
+        $.ajax({url:'step_plus',
+                success: function(resp){
+                    console.log(resp);
+                    $("#countLabel").text("Stepper counts = " + resp.result)
+                    
+                } 
+            
+        });
+    });
+    
+    $("#stepMinusButton").click(function(){        
+        $.ajax({url:'step_minus',
+                success: function(resp){
+                    console.log(resp);
+                    $("#countLabel").text("Stepper counts = " + resp.result)
+                } 
+            
+        });
+    });
+    
+    $("#stepHomeButton").click(function(){        
+        $.ajax({url:'step_home',
+                success: function(resp){
+                    console.log(resp);
+                    $("#countLabel").text("Stepper counts = " + resp.result)
+                } 
+            
+        });
+    });
+    
+    
     $("#runCycleButton").click(function(){
         $.ajax({url:'run_cycle',
                 success: function(resp){
