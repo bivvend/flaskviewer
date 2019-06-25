@@ -50,7 +50,7 @@ class StepperController():
                         GPIO.output(self.control_pins[pin], self.halfstep_seq[halfstep][pin])
                     else:
                         GPIO.output(self.control_pins[pin], self.rev_halfstep_seq[halfstep][pin])
-                    time.sleep(0.001)
+                    time.sleep(0.002)
             if self.forward:
                 self.step_count +=1
             else:
@@ -123,7 +123,7 @@ if __name__ == '__main__':
         #s.stop()
         #time.sleep(1)
         #s.make_step(1, False)
-        s.move_to_count(100)
+        s.move_to_count(300)
         s.home()
         GPIO.cleanup()
     except Exception as e:
