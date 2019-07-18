@@ -177,7 +177,7 @@ def run_actuator_cycle():
         time.sleep(5)
     if motion == stepper_motor:
         print("Running stepper cycle")        
-        stepper.move_to_count(80)
+        stepper.move_to_count(70)
         stepper.home()
     if motion != debug:
         main_camera.set_running_state(True, False) # stop grabbing 
