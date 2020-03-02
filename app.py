@@ -214,7 +214,7 @@ if __name__ == '__main__':
     parser.add_argument('cam', help="system, picam or simulated.")
     parser.add_argument('addr', help ="IP Address of server e.g. 0.0.0.0 or hostip for servers own ip")
     args = parser.parse_args()   
-    
+    stepper = None
     if motion == act:
         #Setup Actuator
         print("Setting up linear actuator")
@@ -230,18 +230,14 @@ if __name__ == '__main__':
         
     #import camera driver
     if args.cam == 'system':
-        if os.environ.get('CAMERA'):
-            print("Using system camera")
-            Camera = import_module('camera_' + os.environ['CAMERA']).Camera
-        else:
-            print("Using simulated camera")
-            from camera import Camera
+        print("Using webcam")
+        from camera_opencv import Camera
     elif args.cam == 'picam':
         # Raspberry Pi camera module (requires picamera package)
         print("Using Raspberry Pi Camera.")
         from camera_pi import Camera
     elif args.cam == 'simulated':    
-        from camera_pi import Camera
+        from camera import Camera
         print("Using simulated camera")
     else:
         from camera import Camera
@@ -249,6 +245,8 @@ if __name__ == '__main__':
     print(args.addr)
 
     #Setup camera
+    if stepper is None:
+        stepper = StepperController([29,31,33,35])
     main_camera = Camera(stepper)
     main_camera.set_save_location(app.config['STATIC_FOLDER'] + '/output.jpg')
     
@@ -260,8 +258,8 @@ if __name__ == '__main__':
             app.run(host = args.addr, port=5000, threaded=True)
     except Exception as e:
         print(e)
-        stepper.clean_up()
-    
-    stepper.clean_up()
+        
+        #stepper.clean_up()    
+    #stepper.clean_up()
 
     

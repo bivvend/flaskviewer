@@ -3,13 +3,10 @@ Flask>=0.12.3
 itsdangerous==0.24
 Jinja2>=2.10.1
 MarkupSafe==1.0
-Werkzeug==0.12.2
+Werkzeug
 flask_bootstrap
 flask_moment
 flask_wtf
-opencv-python
-numpy
 yattag
-scipy
+pigpio
 peakutils
-matplotlib
