@@ -65,11 +65,9 @@ class BaseCamera(object):
     file_path = "output.jpg" # default
     image_buffer_list = []  #tuples of filename, image data
     stepper = None
-    def __init__(self, stepper_in):
+    focus_value = 0
+    def __init__(self):
         """Start the background camera thread if it isn't running yet."""
-        
-        BaseCamera.stepper = stepper_in 
-        print("Camera associated with stepper with pins {0}.".format(BaseCamera.stepper.control_pins))
         if BaseCamera.thread is None:
             BaseCamera.last_access = time.time()
 
@@ -81,7 +79,21 @@ class BaseCamera(object):
             while self.get_frame() is None:
                 time.sleep(1)
             BaseCamera.running = True
-            
+
+    def set_focal_position(self, focus):
+        """Sets the focus value"""
+        print("Setting focus to {0}".format(focus))
+        BaseCamera.focus_value = focus
+        
+    def get_focal_position(self):
+        """Gets the focus value"""
+        return BaseCamera.focus_value
+        
+    def step_focal_position(self, step):
+        """Sets the focus value"""
+        print("Moving focus  by {0}".format(step))
+        BaseCamera.focus_value += step
+                  
     def set_running_state(self, state_in, in_cycle_in):
         """Sets the state True is grabbing without saving, False = saving"""
         print("Setting")
@@ -89,8 +101,7 @@ class BaseCamera(object):
         BaseCamera.in_cycle = in_cycle_in
     
     def clear_buffers(self):
-        '''Clears the image buffers.'''
-        
+        '''Clears the image buffers.'''        
         BaseCamera.image_buffer_list = []
     
     def load_images_to_buffers(self, directory):

@@ -17,9 +17,6 @@ from wtforms import StringField, SubmitField,FileField, IntegerField, FloatField
 from werkzeug.utils import secure_filename
 from wtforms.validators import Required
 
-#internal imports
-from pq12_actuator import PQ12actuator
-from stepper_controller import StepperController
 from run_match import process_images
 
 
@@ -36,13 +33,8 @@ app.config['BITMAP_SAVE_FOLDER']= BITMAP_SAVE_FOLDER
 #Changed to single camera object and thread.
 main_camera = None
 
-act = "USE_ACTUATOR"
-stepper_motor = "USE_STEPPER"
-
 debug = "USE_DEBUG"
 overwrite = "OVERWRITE"
-
-motion = stepper_motor
 saving = overwrite
 
 
@@ -100,8 +92,18 @@ def save_frame():
         
 @app.route('/run_cycle', methods = ['GET'])
 def run_cycle():
-    '''Runs the lucky imaging cycle'''
-    run_actuator_cycle()
+    '''Runs the focus cycle''' 
+    main_camera.clear_buffers()
+    main_camera.set_running_state(False, True)
+    for i in range(0,24):
+        main_camera.set_focal_position(i)
+        time.sleep(0.5)   
+    main_camera.set_running_state(True, False)
+    if saving == debug:
+        delete = False
+    else:
+        delete = True
+    main_camera.save_buffers(app.config['BITMAP_SAVE_FOLDER'], delete)
     return jsonify(result = "RAN_OK")
     
 @app.route('/run_processing', methods = ['GET'])
@@ -112,22 +114,21 @@ def run_processing():
     
 @app.route('/step_plus', methods = ['GET'])
 def step_plus():
-    '''advance stepper motor'''
-    count = stepper.make_step(1, True)
-    return jsonify(result = str(count))  
+    '''advance focus'''
+    main_camera.step_focal_position(1)
+    return jsonify(result = str(main_camera.get_focal_position()))  
     
 @app.route('/step_home', methods = ['GET'])
-def step_home():
-    '''home stepper motor'''
-    stepper.home()
-    count = stepper.get_count()
-    return jsonify(result = str(count))  
+def step_home():    
+    '''home focus'''
+    main_camera.set_focal_position(0)
+    return jsonify(result = str(main_camera.get_focal_position())) 
     
 @app.route('/step_minus', methods = ['GET'])
 def step_minus():
-    '''advance stepper motor'''
-    count = stepper.make_step(1, False)
-    return jsonify(result = str(count)) 
+    '''retract focus'''
+    main_camera.step_focal_position(-1)
+    return jsonify(result = str(main_camera.get_focal_position())) 
     
 @app.route('/gallery_refresh', methods = ['GET'])
 def gallery_refresh():
@@ -161,33 +162,6 @@ def run_image_processing():
    
     process_images(main_camera.image_buffer_list, app.config['BITMAP_SAVE_FOLDER'])
                
-def run_actuator_cycle():
-    print("Running linear motion cycle")
-    main_camera.clear_buffers()
-    
-    if motion != debug:
-        stepper.home()
-        main_camera.set_running_state(False, True) #start grabbing to series
-    if motion == act:
-        lin_acc.set_duty(0.1)
-        time.sleep(2)
-        lin_acc.set_duty(0.8)
-        time.sleep(7)
-        lin_acc.set_duty(0.1)
-        time.sleep(5)
-    if motion == stepper_motor:
-        print("Running stepper cycle")        
-        stepper.move_to_count(70)
-        stepper.home()
-    if motion != debug:
-        main_camera.set_running_state(True, False) # stop grabbing 
-    if motion == act:
-        lin_acc.stop() 
-    if saving == debug:
-        delete = False
-    else:
-        delete = True
-    main_camera.save_buffers(app.config['BITMAP_SAVE_FOLDER'], delete)  
     
 def make_gallery_html():
     doc, tag, text = Doc().tagtext()
@@ -211,43 +185,15 @@ def make_best_gallery_html():
 ##MAIN
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('cam', help="system, picam or simulated.")
     parser.add_argument('addr', help ="IP Address of server e.g. 0.0.0.0 or hostip for servers own ip")
     args = parser.parse_args()   
-    stepper = None
-    if motion == act:
-        #Setup Actuator
-        print("Setting up linear actuator")
-        lin_acc = PQ12actuator(18, 1000, 0)
-        lin_acc.start() # setup
-        lin_acc.stop() #set duty and freq to zero
-    if motion == stepper_motor:
-        print("Setting up stepper motor")
-        stepper = StepperController([29,31,33,35])
-        pass
-    if motion == debug:
-        print("Using simulated motion")
-        
+
+       
     #import camera driver
-    if args.cam == 'system':
-        print("Using webcam")
-        from camera_opencv import Camera
-    elif args.cam == 'picam':
-        # Raspberry Pi camera module (requires picamera package)
-        print("Using Raspberry Pi Camera.")
-        from camera_pi import Camera
-    elif args.cam == 'simulated':    
-        from camera import Camera
-        print("Using simulated camera")
-    else:
-        from camera import Camera
-        print("Using simulated camera")
-    print(args.addr)
+    from camera_opencv import Camera
 
     #Setup camera
-    if stepper is None:
-        stepper = StepperController([29,31,33,35])
-    main_camera = Camera(stepper)
+    main_camera = Camera()
     main_camera.set_save_location(app.config['STATIC_FOLDER'] + '/output.jpg')
     
     
