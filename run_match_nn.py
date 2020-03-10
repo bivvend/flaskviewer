@@ -11,11 +11,12 @@ from tensorflow.keras.models import model_from_json, load_model
 
 
 def load_nn():
-	loaded_model = load_model("final_model.h5")
-	loaded_model.compile(loss='mse',     #mean_squared_error 
-	optimizer=optimizers.Adam(lr=2e-5),
-	metrics=['acc'])
-	print("Loaded model from disk")
+	#loaded_model = load_model("final_model.h5")
+	#loaded_model.compile(loss='mse',     #mean_squared_error 
+	#optimizer=optimizers.Adam(lr=2e-5),
+	#metrics=['acc'])
+	#print("Loaded model from disk")
+	loaded_model = None
 	return loaded_model	
 	
 def process_images(image_list, model):

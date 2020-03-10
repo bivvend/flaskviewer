@@ -81,10 +81,12 @@ def save_frame():
     """Saves a frame to be displayed on screen - not for processing"""
     if main_camera is not None:
         main_camera.set_save_location(app.config['STATIC_FOLDER'] + '/output.jpg')
+        main_camera.set_resolution(2592, 1944)
         main_camera.set_running_state(False, False)
         #Sleep until a frame has been saved
-        time.sleep(1)
+        time.sleep(10)
         main_camera.set_running_state(True, False)
+        main_camera.set_resolution(640, 480)
         main_camera.set_save_location(app.config['BITMAP_SAVE_FOLDER'] + '/output.jpg')
         return jsonify(result = app.config['STATIC_FOLDER'] + '/output.jpg')
     else:

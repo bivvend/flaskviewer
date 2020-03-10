@@ -66,6 +66,9 @@ class BaseCamera(object):
     image_buffer_list = []  #tuples of filename, image data
     stepper = None
     focus_value = 0
+    res_x = 640
+    res_y = 480
+    
     def __init__(self):
         """Start the background camera thread if it isn't running yet."""
         if BaseCamera.thread is None:
@@ -79,7 +82,10 @@ class BaseCamera(object):
             while self.get_frame() is None:
                 time.sleep(1)
             BaseCamera.running = True
-
+    def set_resolution(self, x, y):
+        BaseCamera.res_x = x
+        BaseCamera.res_y = y
+		
     def set_focal_position(self, focus):
         """Sets the focus value"""
         print("Setting focus to {0}".format(focus))

@@ -6,30 +6,39 @@ from base_camera import BaseCamera
 
 class Camera(BaseCamera):
     video_source = 0
+    camera = None
+    
+   
     
     @staticmethod
     def set_video_source(source):
-        Camera.video_source = source
+        camera.video_source = source
 	
     @staticmethod
     def frames():
-        camera = cv2.VideoCapture(Camera.video_source,cv2.CAP_V4L)
+        camera = cv2.VideoCapture(Camera.video_source,cv2.CAP_V4L)		
         camera.set(cv2.CAP_PROP_BUFFERSIZE, 1)
         camera.set(cv2.CAP_PROP_AUTOFOCUS, 0)
         if not camera.isOpened():
             raise RuntimeError('Could not start camera.')
         ok_flag = True
         last_focus = 0
+        last_res_x = 640
+        last_res_y = 480
         while ok_flag:
             time.sleep(0.0)
+            if last_res_x != BaseCamera.res_x or last_res_y != BaseCamera.res_y:
+                print("Setting resolution to {0},{1}".format(BaseCamera.res_x, BaseCamera.res_y))
+                camera.set(cv2.CAP_PROP_FRAME_WIDTH, BaseCamera.res_x)
+                camera.set(cv2.CAP_PROP_FRAME_HEIGHT, BaseCamera.res_y)
+                last_res_x = BaseCamera.res_x
+                last_res_y = BaseCamera.res_y
             if last_focus != BaseCamera.focus_value:
-                print("Here")
                 camera.set(cv2.CAP_PROP_FOCUS, BaseCamera.focus_value)
                 last_focus = BaseCamera.focus_value
             ok_flag, img = camera.read()
             if not BaseCamera.running:
                 if BaseCamera.in_cycle:
-                    time.sleep(0.2)
                     print("Saving image to buffer")                    
                     img_num = len(BaseCamera.image_buffer_list)
                     print(BaseCamera.focus_value)                    
